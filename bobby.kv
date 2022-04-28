@@ -5,8 +5,8 @@
 
     text_input: text_input
     enter_btn: enter_btn
-    on_size:
-        root.rescale_enter_btn()
+    input_panel: input_panel
+    messages_panel: messages_panel
 
     BoxLayout:  # верхняя панель
         canvas:
@@ -22,7 +22,8 @@
             text: 'Bobby'
             font_size: 16
 
-    BoxLayout:  # панель сообщений
+    ScrollView:  # панель сообщений
+        id: messages_panel
         canvas:
             Color:
                 rgba: (211/255, 233/255, 235/255, 1)
@@ -36,6 +37,7 @@
             text: 'messages here'
 
     BoxLayout:  # панель ввода
+        id: input_panel
         canvas:
             Color:
                 rgba: (1, 1, 1, 1)
@@ -44,15 +46,28 @@
                 size: self.size
         size_hint: (1, 0.06)
 
-        TextInput:
-            id: text_input
-            padding: (10, 10)
-            on_text:
-                root.rescale_text_input()
+        ScrollView:
+            TextInput:
+                id: text_input
+                background_color: 0,0,0,0
+                hint_text: 'Enter text here'
+                cursor_color: 81/255, 125/255, 162/255, 1
+                cursor_width: 2
+                padding: (10, 8)
+                text_size: self.size
+                font_size: 14
+                multiline: True
 
         Button:
             id: enter_btn
-            text: 'Enter'
+            foreground_color: 1,1,1,1
+            background_color: 0,0,0,0
+            text: '<'
+            font_size: 18
+            color: 81/255, 125/255, 162/255, 1
             size_hint: (.1, 1)
             on_press:
+                self.background_color = 211/255, 233/255, 235/255, 0.3
                 root.send_data()
+            on_release:
+                self.background_color = 0,0,0,0
