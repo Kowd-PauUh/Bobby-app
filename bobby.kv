@@ -1,0 +1,45 @@
+
+
+<Container>:
+    orientation: 'vertical'
+
+    BoxLayout:  # верхняя панель
+        canvas:
+            Color:
+                rgba: (81/255, 125/255, 162/255, 1)
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        size_hint: (1, 0.1)
+
+        Label:
+            color: 'black'
+            text: 'Bobby'
+
+    BoxLayout:  # панель сообщений
+        canvas:
+            Color:
+                rgba: (211/255, 233/255, 235/255, 1)
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        size_hint: (1, 0.84)
+
+        Label:
+            color: 'black'
+            text: 'messages here'
+
+    BoxLayout:  # панель ввода
+        canvas:
+            Color:
+                rgba: (1, 1, 1, 1)
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        size_hint: (1, 0.06)
+
+        TextInput:
+            padding: (10, 10)
+
+        Button:
+            text: 'Enter'
