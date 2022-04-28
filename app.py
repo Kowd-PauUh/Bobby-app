@@ -15,7 +15,6 @@ class Bobby(App):
 
         enter_btn = Button(text='Enter')
 
-
         layout = BoxLayout()
         layout.add_widget(self.text_input)
         layout.add_widget(enter_btn)
@@ -23,5 +22,4 @@ class Bobby(App):
 
 
 if __name__ == '__main__':
-    app = Bobby()
-    app.run()
+    Bobby().run()
