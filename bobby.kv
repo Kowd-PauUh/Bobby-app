@@ -3,6 +3,11 @@
 <Container>:
     orientation: 'vertical'
 
+    text_input: text_input
+    enter_btn: enter_btn
+    on_size:
+        root.rescale_enter_btn()
+
     BoxLayout:  # верхняя панель
         canvas:
             Color:
@@ -13,8 +18,9 @@
         size_hint: (1, 0.1)
 
         Label:
-            color: 'black'
+            color: 'white'
             text: 'Bobby'
+            font_size: 16
 
     BoxLayout:  # панель сообщений
         canvas:
@@ -39,7 +45,14 @@
         size_hint: (1, 0.06)
 
         TextInput:
+            id: text_input
             padding: (10, 10)
+            on_text:
+                root.rescale_text_input()
 
         Button:
+            id: enter_btn
             text: 'Enter'
+            size_hint: (.1, 1)
+            on_press:
+                root.send_data()
