@@ -1,16 +1,27 @@
 from kivy.app import App
 from kivy.uix.label import Label
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.textinput import TextInput
+from kivy.uix.button import Button
 
 
-class MainApp(App):
+class Bobby(App):
+
+    def __init__(self):
+        super().__init__()
+        self.text_input = TextInput()
+
     def build(self):
-        label = Label(text='Bobby',
-                      size_hint=(.5, .5),
-                      pos_hint={'center_x': .5, 'center_y': .5})
 
-        return label
+        enter_btn = Button(text='Enter')
+
+
+        layout = BoxLayout()
+        layout.add_widget(self.text_input)
+        layout.add_widget(enter_btn)
+        return layout
 
 
 if __name__ == '__main__':
-    app = MainApp()
+    app = Bobby()
     app.run()
