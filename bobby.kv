@@ -23,28 +23,43 @@
             size: self.size[0]/2-2, self.size[1]/2-2
     padding: (12, 10)
     size_hint_y: None
+    orientation: 'vertical'
 
-    label: msg_label
+    content_label: content_label
+    time_label: time_label
+
     Label:
-        id: msg_label
+        id: time_label
+        text: '21:59'
+        font_size: 10
+        font_name: 'Roboto'
+        background_color: 0,0,0,0
+        color: 180/255, 180/255, 180/255, 1
+
+    Label:
+        id: content_label
         text: 'Message'
         font_size: 14
         font_name: 'Roboto'
-        background_color: 0, 0, 0, 0
+        background_color: 0,0,0,0
         color: 'black'
         size_hint_y: None
         text_size: self.width, None
         size: self.texture_size
 
+<PopupButton>:
+
 <Container>:
     orientation: 'vertical'
 
+    upper_panel: upper_panel
+    messages_panel: messages_panel
+    input_panel: input_panel
     text_input: text_input
     enter_btn: enter_btn
-    input_panel: input_panel
-    messages_panel: messages_panel
 
     BoxLayout:  # верхняя панель
+        id: upper_panel
         canvas:
             Color:
                 rgba: (81/255, 125/255, 162/255, 1)
@@ -53,12 +68,13 @@
                 size: self.size
         size_hint: (1, 0.1)
 
-        Label:
+        ClickableLabel:
+            container: root
             color: 'white'
             text: 'Bobby'
             font_size: 16
 
-    ScrollView:  # панель сообщений
+    RecycleView:  # панель сообщений
         id: messages_panel
         canvas.before:
             Color:
@@ -67,16 +83,21 @@
                 pos: self.pos
                 size: self.size
         size_hint: (1, 0.84)
+        viewclass: 'BoxLayout'
+
         messages: messages_layout
+
+        on_scroll_move:
+            root.show_scroll_down_btn()
 
         BoxLayout:
             id: messages_layout
             orientation: 'vertical'
             size_hint_y: None
+            size_hint_x: 1
+            size: 1, self.spacing
             padding: 5
             spacing: 5
-#            size_hint_y: None
-#            size: self.size[0], 0
 
     BoxLayout:  # панель ввода
         id: input_panel
@@ -111,6 +132,7 @@
             size_hint: (.1, 1)
             on_press:
                 self.background_color = 211/255, 233/255, 235/255, 0.3
-                root.send_data()
+                root.get_data_from_user()
             on_release:
                 self.background_color = 0,0,0,0
+                root.text_input.focus = True

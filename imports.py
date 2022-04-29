@@ -10,6 +10,8 @@ from kivy.uix.gridlayout import GridLayout  # размещение виджет�
 from kivy.uix.stacklayout import StackLayout  # размещение виджетов сколько везет в строку
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
+from kivy.uix.scrollview import ScrollView
+from kivy.uix.popup import Popup
 
 import sqlite3 as sl
 from os.path import exists
