@@ -51,8 +51,19 @@ class Message(BoxLayout):
             message_id, message_from, content_type, text, image_path, audio_path, video_path, date, time, reply_to \
                 = message_info
 
+            if not messages_panel.message_blocks.children:  # создание блока сообщения
+                Message().add_block(messages_panel, date)
+            elif messages_panel.message_blocks.children[0].date != date:
+                Message().add_block(messages_panel, date)
             Message().show_message(messages_panel, message_id, message_from, content_type, text,
                                    image_path, audio_path, video_path, date, time, reply_to)
+
+    @staticmethod
+    def add_block(messages_panel: ScrollView, date):
+        new_block = MessageBlock(date=date)
+        new_block.date_label.text = f'{date[8:]}.{date[5:7]}.{date[:4]}'
+        messages_panel.message_blocks.add_widget(new_block)
+        messages_panel.message_blocks.size[1] += new_block.size[1]
 
     @staticmethod
     def show_message(messages_panel: ScrollView, message_id: int, message_from: str, content_type: str, text: str,
@@ -63,14 +74,20 @@ class Message(BoxLayout):
         message.time_label.text = time[:5]
 
         Clock.schedule_once(message._rescale, 0)
-        messages_panel.messages.size[1] += message.size[1]
-        messages_panel.messages.add_widget(message)
+        messages_panel.message_blocks.children[0].add_widget(message)
         messages_panel.scroll_to(message)
 
     def _rescale(self, _):
-        size = self.content_label.texture_size[1] + 2 * self.padding[1]  # + self.time_label.texture_size[1]
+        size = self.content_label.texture_size[1] + 2 * self.padding[1]
         self.size[1] = size
-        self.messages_panel.messages.size[1] += size - 95
+        self.messages_panel.message_blocks.size[1] += \
+            size + self.messages_panel.message_blocks.spacing
+        self.messages_panel.message_blocks.children[0].size[1] += \
+            size + self.messages_panel.message_blocks.children[0].spacing
+
+
+class MessageBlock(BoxLayout):
+    date = StringProperty(defaultvalue='date')
 
 
 class ClickableLabel(Label):
@@ -89,12 +106,12 @@ class Container(BoxLayout):
     enter_btn = ObjectProperty()
 
     def get_data_from_user(self):
-        if self.text_input.text == '' and self.messages_panel.messages.children:
-            self.messages_panel.scroll_to(self.messages_panel.messages.children[0])
+        if self.text_input.text == '' and self.messages_panel.message_blocks.children:
+            self.messages_panel.scroll_to(self.messages_panel.message_blocks.children[0])
 
         if self.text_input.text != '':
-            Message().handle_message('user', 'text', self.text_input.text)
-            Message().get_message(self.messages_panel)  # show last message
+            # Message().handle_message('user', 'text', self.text_input.text)
+            # Message().get_message(self.messages_panel)  # show last message
 
             Message().handle_message('bobby', 'text', self.text_input.text)
             Message().get_message(self.messages_panel)  # show last message
@@ -102,8 +119,8 @@ class Container(BoxLayout):
             self.text_input.text = ''
 
     def refresh_chat(self):
-        self.messages_panel.messages.clear_widgets()
-        self.messages_panel.messages.size[1] = self.messages_panel.messages.spacing
+        self.messages_panel.message_blocks.clear_widgets()
+        self.messages_panel.message_blocks.size[1] = self.messages_panel.message_blocks.spacing
         Message().get_message(self.messages_panel, message_id=True)  # show all messages
 
     def rescale_enter_btn(self):

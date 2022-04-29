@@ -16,12 +16,12 @@
         Color:
             rgba: (1,1,1,1) if self.message_from=='bobby' else (239/255,254/255,221/255,1)
         RoundedRectangle:
-            pos: (self.pos[0], self.pos[1]+2) if self.message_from=='bobby' else (self.pos[0]+2, self.pos[1]+2)
-            size: self.size[0]-2, self.size[1]-2
+            pos: (self.pos[0], self.pos[1]+2) if self.message_from=='bobby' else (self.pos[0], self.pos[1]+2)
+            size: self.size[0], self.size[1]-2
             radius: [18,]
         Rectangle:
-            pos: (self.pos[0], self.pos[1]+2) if self.message_from=='bobby' else (self.pos[0]+self.width/2+2,self.pos[1]+2)
-            size: self.size[0]/2-2, self.size[1]/2-2
+            pos: (self.pos[0], self.pos[1]+2) if self.message_from=='bobby' else (self.pos[0]+self.width/2,self.pos[1]+2)
+            size: self.size[0]/2, self.size[1]/2-2
     padding: (12, 10)
     size_hint_y: None
 #    orientation: 'vertical'
@@ -60,16 +60,38 @@
         background_color: 0,0,0,0
         color: 180/255, 180/255, 180/255, 1
 
-#<PopupButton>:
-#    auto_dismiss: True
-#    title: ''
-#    size_hint: 0.3, 0.2
-#    pos_hint: {'center_x': 0.5, 'bottom': 0.06}
-#    background_color: 0,0,0,0
-#    foreground_color: 0,0,0,0
-#    Button:
-#        size_hint: 1, 1
-#        text: 'v'
+<MessageBlock>:
+
+    date_label: date_label
+    orientation: 'vertical'
+    spacing: 5
+
+    Label:
+        canvas.before:
+            Color:
+                rgba: 0,0,0,0.18
+            RoundedRectangle:
+                pos: self.pos[0]-8, self.pos[1]-7,
+                size: self.size[0]+16, self.size[1]+14
+                radius: [16,]
+
+        id: date_label
+        text: 'date'
+        font_size: 14
+        font_name: 'Roboto'
+        size_hint: None, None
+        size: self.texture_size
+        pos_hint: {'center_x': 0.5}
+        background_color: 0,0,0,0
+        color: 1,1,1,1
+
+    BoxLayout:
+        id: message_block
+        orientation: 'vertical'
+        size_hint_y: None
+        size_hint_x: 1
+        size: 1, self.spacing
+        spacing: 5
 
 <Container>:
     orientation: 'vertical'
@@ -108,10 +130,10 @@
         bar_color: 81/255, 125/255, 162/255, 1
         viewclass: 'BoxLayout'
 
-        messages: messages_layout
+        message_blocks: message_blocks
 
         BoxLayout:
-            id: messages_layout
+            id: message_blocks
             orientation: 'vertical'
             size_hint_y: None
             size_hint_x: 1
