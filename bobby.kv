@@ -1,3 +1,4 @@
+# import Factory kivy.factory.Factory
 
 <Message>:
     background_color: 0,0,0,0  # the last zero is the critical on, make invisible
@@ -23,18 +24,18 @@
             size: self.size[0]/2-2, self.size[1]/2-2
     padding: (12, 10)
     size_hint_y: None
-    orientation: 'vertical'
+#    orientation: 'vertical'
 
     content_label: content_label
     time_label: time_label
 
-    Label:
-        id: time_label
-        text: '21:59'
-        font_size: 10
-        font_name: 'Roboto'
-        background_color: 0,0,0,0
-        color: 180/255, 180/255, 180/255, 1
+#    Label:
+#        id: time_label
+#        text: '21:59'
+#        font_size: 10
+#        font_name: 'Roboto'
+#        background_color: 0,0,0,0
+#        color: 180/255, 180/255, 180/255, 1
 
     Label:
         id: content_label
@@ -47,7 +48,28 @@
         text_size: self.width, None
         size: self.texture_size
 
-<PopupButton>:
+    Label:
+        id: time_label
+        size_hint_x: None
+        size_hint_y: None
+
+        size: self.texture_size
+        text: '21:59'
+        font_size: 10
+        font_name: 'Roboto'
+        background_color: 0,0,0,0
+        color: 180/255, 180/255, 180/255, 1
+
+#<PopupButton>:
+#    auto_dismiss: True
+#    title: ''
+#    size_hint: 0.3, 0.2
+#    pos_hint: {'center_x': 0.5, 'bottom': 0.06}
+#    background_color: 0,0,0,0
+#    foreground_color: 0,0,0,0
+#    Button:
+#        size_hint: 1, 1
+#        text: 'v'
 
 <Container>:
     orientation: 'vertical'
@@ -83,12 +105,10 @@
                 pos: self.pos
                 size: self.size
         size_hint: (1, 0.84)
+        bar_color: 81/255, 125/255, 162/255, 1
         viewclass: 'BoxLayout'
 
         messages: messages_layout
-
-        on_scroll_move:
-            root.show_scroll_down_btn()
 
         BoxLayout:
             id: messages_layout
@@ -126,8 +146,8 @@
             id: enter_btn
             foreground_color: 1,1,1,1
             background_color: 0,0,0,0
-            text: '<'
-            font_size: 18
+            text: '<' if root.text_input.text != '' else 'v'
+            font_size: 18 if root.text_input.text != '' else 16
             color: 81/255, 125/255, 162/255, 1
             size_hint: (.1, 1)
             on_press:

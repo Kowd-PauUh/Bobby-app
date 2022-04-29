@@ -59,20 +59,18 @@ class Message(BoxLayout):
                      image_path, audio_path, video_path, date, time, reply_to: int):
         message = Message(message_from=message_from, messages_panel=messages_panel)
         message.content_label.text = text
-        message.time_label.text = f'{date[8:]}.{date[5:7]}.{date[:4]}   {time[:5]}'
+        # message.time_label.text = f'{date[8:]}.{date[5:7]}.{date[:4]}   {time[:5]}'
+        message.time_label.text = time[:5]
+
         Clock.schedule_once(message._rescale, 0)
         messages_panel.messages.size[1] += message.size[1]
         messages_panel.messages.add_widget(message)
         messages_panel.scroll_to(message)
 
     def _rescale(self, _):
-        size = self.content_label.texture_size[1] + 2 * self.padding[1] + self.time_label.texture_size[1]
+        size = self.content_label.texture_size[1] + 2 * self.padding[1]  # + self.time_label.texture_size[1]
         self.size[1] = size
         self.messages_panel.messages.size[1] += size - 95
-
-
-class PopupButton(Popup):
-    pass
 
 
 class ClickableLabel(Label):
@@ -91,6 +89,9 @@ class Container(BoxLayout):
     enter_btn = ObjectProperty()
 
     def get_data_from_user(self):
+        if self.text_input.text == '' and self.messages_panel.messages.children:
+            self.messages_panel.scroll_to(self.messages_panel.messages.children[0])
+
         if self.text_input.text != '':
             Message().handle_message('user', 'text', self.text_input.text)
             Message().get_message(self.messages_panel)  # show last message
@@ -117,9 +118,6 @@ class Container(BoxLayout):
         else:
             self.input_panel.size_hint[1] = 0.06
             self.messages_panel.size_hint[1] = 0.84
-
-    def show_scroll_down_btn(self):
-        pass
 
     def loop(self, _):
         self.rescale_enter_btn()
