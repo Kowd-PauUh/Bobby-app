@@ -1,16 +1,33 @@
 from imports import *
 
 Config.set('kivy', 'keyboard_mode', 'systemanddock')
-con = sl.connect('bobby.db')
+if exists('AppData/chat-history.db'):
+    con = sl.connect('AppData/chat-history.db')
+if not exists('AppData/chat-history.db'):
+    con = sl.connect('AppData/chat-history.db')
+    with con:
+        con.execute("""
+            CREATE TABLE HISTORY (
+                message_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                message_from TEXT, -- bobby / user
+                type TEXT, -- text / image / audio / video
+                text TEXT, -- if type is text
+                image_path TEXT, -- if type is image
+                audio_path TEXT, -- if type is audio
+                video_path TEXT, -- if type is video
+                date DATE DEFAULT CURRENT_DATE , -- YY-MM-DD
+                time TIME DEFAULT CURRENT_TIME , -- hh-mm-ss
+                reply_to INTEGER
+            );
+        """)
 
-with con:
-    con.execute("""
-        CREATE TABLE USER (
-            id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            age INTEGER
-        );
-    """)
+
+class Message(BoxLayout):
+    message_from = StringProperty()
+
+    def rescale(self, _):
+        self.size[1] = self.label.texture_size[1] + 2 * self.padding[1]
+
 
 class Container(BoxLayout):
     input_panel = ObjectProperty()
@@ -20,9 +37,26 @@ class Container(BoxLayout):
 
     def send_data(self):
         if self.text_input.text != '':
-            print(self.text_input.text)
+            sql = 'INSERT INTO HISTORY (message_from, type, text) values(?, ?, ?)'
+            data = 'user', 'text', self.text_input.text
+            with con:
+                con.execute(sql, data)
+
+            message = Message(message_from='user')
+            message.label.text = self.text_input.text
+            Clock.schedule_once(message.rescale, 0)
+            self.messages_panel.messages.size[1] += message.size[1]
+            self.messages_panel.messages.add_widget(message)
+            self.messages_panel.scroll_to(message)
+
+            message = Message(message_from='bobby')
+            message.label.text = self.text_input.text
+            Clock.schedule_once(message.rescale, 0)
+            self.messages_panel.messages.size[1] += message.size[1]
+            self.messages_panel.messages.add_widget(message)
+            self.messages_panel.scroll_to(message)
+
             self.text_input.text = ''
-            print(self.text_input.size)
 
     def rescale(self):
         self.enter_btn.size_hint[0] = self.height * 0.06 / self.width
