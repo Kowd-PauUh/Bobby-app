@@ -1,4 +1,40 @@
 
+<Message>:
+    background_color: 0,0,0,0  # the last zero is the critical on, make invisible
+    canvas.before:
+        Color:
+            rgba: (189/255,194/255,199/255,1)
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [20,]
+        Rectangle:
+            pos: self.pos if self.message_from=='bobby' else (self.pos[0]+self.width/2,self.pos[1])
+            size: self.size[0]/2, self.size[1]/2
+
+        Color:
+            rgba: (1,1,1,1) if self.message_from=='bobby' else (239/255,254/255,221/255,1)
+        RoundedRectangle:
+            pos: (self.pos[0], self.pos[1]+2) if self.message_from=='bobby' else (self.pos[0]+2, self.pos[1]+2)
+            size: self.size[0]-2, self.size[1]-2
+            radius: [18,]
+        Rectangle:
+            pos: (self.pos[0], self.pos[1]+2) if self.message_from=='bobby' else (self.pos[0]+self.width/2+2,self.pos[1]+2)
+            size: self.size[0]/2-2, self.size[1]/2-2
+    padding: (12, 10)
+    size_hint_y: None
+
+    label: msg_label
+    Label:
+        id: msg_label
+        text: 'Message'
+        font_size: 14
+        font_name: 'Roboto'
+        background_color: 0, 0, 0, 0
+        color: 'black'
+        size_hint_y: None
+        text_size: self.width, None
+        size: self.texture_size
 
 <Container>:
     orientation: 'vertical'
@@ -24,17 +60,23 @@
 
     ScrollView:  # панель сообщений
         id: messages_panel
-        canvas:
+        canvas.before:
             Color:
                 rgba: (211/255, 233/255, 235/255, 1)
             Rectangle:
                 pos: self.pos
                 size: self.size
         size_hint: (1, 0.84)
+        messages: messages_layout
 
-        Label:
-            color: 'black'
-            text: 'messages here'
+        BoxLayout:
+            id: messages_layout
+            orientation: 'vertical'
+            size_hint_y: None
+            padding: 5
+            spacing: 5
+#            size_hint_y: None
+#            size: self.size[0], 0
 
     BoxLayout:  # панель ввода
         id: input_panel
@@ -56,6 +98,7 @@
                 padding: (10, 8)
                 text_size: self.size
                 font_size: 14
+                font_name: 'Roboto'
                 multiline: True
 
         Button:
