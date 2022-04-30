@@ -124,10 +124,6 @@ class Container(BoxLayout):
         if self.text_input.text != '':
             Message().handle_message('user', 'text', self.text_input.text)
             Message().get_message(self.messages_panel)  # show last message
-
-            # Message().handle_message('bobby', 'text', self.text_input.text)
-            # Message().get_message(self.messages_panel)  # show last message
-
             self.text_input.text = ''
 
     def load_chat(self):
