@@ -2,3 +2,4 @@
 app/
 .idea/
 __pycache__/
+testing.py
