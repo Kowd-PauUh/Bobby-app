@@ -27,9 +27,10 @@ class MessageBlock(BoxLayout):
 
 
 class Message(BoxLayout):
+    messages_panel = ObjectProperty()  # панель в которой находятся блоки с сообщениями
+    block = ObjectProperty()  # блок в котором находятся сообщения (в каждом блоке сообщения определенной даты отправки)
     message_from = StringProperty()
-    messages_panel = ObjectProperty()
-    block = ObjectProperty()
+    content_type = StringProperty()
 
     @staticmethod
     def handle_message(message_from: str, content_type: str, text: str = None, reply_to: int = None,
@@ -75,9 +76,8 @@ class Message(BoxLayout):
     def show_message(messages_panel: ScrollView, message_id: int, message_from: str, content_type: str, text: str,
                      image_path, audio_path, video_path, date, time, reply_to: int):
         if content_type == 'text':
-            message = TextMessage(message_from=message_from, messages_panel=messages_panel)
+            message = TextMessage(message_from=message_from, messages_panel=messages_panel, content_type=content_type)
             message.content_label.text = text
-            # message.time_label.text = f'{date[8:]}.{date[5:7]}.{date[:4]}   {time[:5]}'
             message.time_label.text = time[:5]
             message.block = messages_panel.message_blocks.children[0]
 
@@ -86,11 +86,12 @@ class Message(BoxLayout):
         messages_panel.scroll_to(message)
 
     def _rescale(self, _):
-        size = self.content_label.texture_size[1] + 2 * self.padding[1]
-        self.size[1] = size
-        self.messages_panel.message_blocks.size[1] += \
-            size + self.messages_panel.message_blocks.spacing
-        self.block.size[1] += size + self.block.spacing
+        if self.content_type == 'text':
+            size = self.content_label.texture_size[1] + 2 * self.padding[1]
+            self.size[1] = size
+            self.messages_panel.message_blocks.size[1] += \
+                size + self.messages_panel.message_blocks.spacing
+            self.block.size[1] += size + self.block.spacing
 
 
 class TextMessage(Message):
