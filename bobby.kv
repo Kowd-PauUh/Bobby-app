@@ -1,7 +1,7 @@
 # import Factory kivy.factory.Factory
 
 <Message>:
-    background_color: 0,0,0,0  # the last zero is the critical on, make invisible
+    background_color: 0,0,0,0
     canvas.before:
         Color:
             rgba: (189/255,194/255,199/255,1)
@@ -24,19 +24,13 @@
             size: self.size[0]/2, self.size[1]/2-2
     padding: (12, 10)
     size_hint_y: None
-#    orientation: 'vertical'
 
+<TextMessage>:
+    orientation: 'horizontal'
     content_label: content_label
     time_label: time_label
 
-#    Label:
-#        id: time_label
-#        text: '21:59'
-#        font_size: 10
-#        font_name: 'Roboto'
-#        background_color: 0,0,0,0
-#        color: 180/255, 180/255, 180/255, 1
-
+    # content label
     Label:
         id: content_label
         text: 'Message'
@@ -48,6 +42,7 @@
         text_size: self.width, None
         size: self.texture_size
 
+    # time label
     Label:
         id: time_label
         size_hint_x: None
@@ -60,11 +55,28 @@
         background_color: 0,0,0,0
         color: 180/255, 180/255, 180/255, 1
 
+<ImageMessage>:
+    orientation: 'vertical'
+
+    Image:
+        source: 'logo.jpg'
+        size: self.texture_size
+
 <MessageBlock>:
+
+    # для отладки
+#    canvas.before:
+#        Color:
+#            rgba: 0,0,0,0.18
+#        Rectangle:
+#            pos: self.pos
+#            size: self.size
 
     date_label: date_label
     orientation: 'vertical'
+    size_hint_y: None
     spacing: 5
+    padding: 5
 
     Label:
         canvas.before:
@@ -90,7 +102,7 @@
         orientation: 'vertical'
         size_hint_y: None
         size_hint_x: 1
-        size: 1, self.spacing
+        size: 0, self.spacing
         spacing: 5
 
 <Container>:
@@ -137,7 +149,7 @@
             orientation: 'vertical'
             size_hint_y: None
             size_hint_x: 1
-            size: 1, self.spacing
+#            size: 1, self.spacing
             padding: 5
             spacing: 5
 

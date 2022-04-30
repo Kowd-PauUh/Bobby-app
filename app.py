@@ -22,9 +22,14 @@ if not exists('AppData/chat-history.db'):
         """)
 
 
+class MessageBlock(BoxLayout):
+    date = StringProperty(defaultvalue='date')
+
+
 class Message(BoxLayout):
     message_from = StringProperty()
     messages_panel = ObjectProperty()
+    block = ObjectProperty()
 
     @staticmethod
     def handle_message(message_from: str, content_type: str, text: str = None, reply_to: int = None,
@@ -62,16 +67,19 @@ class Message(BoxLayout):
     def add_block(messages_panel: ScrollView, date):
         new_block = MessageBlock(date=date)
         new_block.date_label.text = f'{date[8:]}.{date[5:7]}.{date[:4]}'
+        new_block.size[1] = 37
         messages_panel.message_blocks.add_widget(new_block)
-        messages_panel.message_blocks.size[1] += new_block.size[1]
+        messages_panel.message_blocks.size[1] += new_block.size[1] + messages_panel.message_blocks.spacing
 
     @staticmethod
     def show_message(messages_panel: ScrollView, message_id: int, message_from: str, content_type: str, text: str,
                      image_path, audio_path, video_path, date, time, reply_to: int):
-        message = Message(message_from=message_from, messages_panel=messages_panel)
-        message.content_label.text = text
-        # message.time_label.text = f'{date[8:]}.{date[5:7]}.{date[:4]}   {time[:5]}'
-        message.time_label.text = time[:5]
+        if content_type == 'text':
+            message = TextMessage(message_from=message_from, messages_panel=messages_panel)
+            message.content_label.text = text
+            # message.time_label.text = f'{date[8:]}.{date[5:7]}.{date[:4]}   {time[:5]}'
+            message.time_label.text = time[:5]
+            message.block = messages_panel.message_blocks.children[0]
 
         Clock.schedule_once(message._rescale, 0)
         messages_panel.message_blocks.children[0].add_widget(message)
@@ -82,12 +90,15 @@ class Message(BoxLayout):
         self.size[1] = size
         self.messages_panel.message_blocks.size[1] += \
             size + self.messages_panel.message_blocks.spacing
-        self.messages_panel.message_blocks.children[0].size[1] += \
-            size + self.messages_panel.message_blocks.children[0].spacing
+        self.block.size[1] += size + self.block.spacing
 
 
-class MessageBlock(BoxLayout):
-    date = StringProperty(defaultvalue='date')
+class TextMessage(Message):
+    pass
+
+
+class ImageMessage(Message):
+    pass
 
 
 class ClickableLabel(Label):
@@ -95,7 +106,7 @@ class ClickableLabel(Label):
 
     def on_touch_down(self, touch):
         if touch.is_triple_tap:  # refresh chat
-            self.container.refresh_chat()
+            self.container.load_chat()
 
 
 class Container(BoxLayout):
@@ -110,15 +121,15 @@ class Container(BoxLayout):
             self.messages_panel.scroll_to(self.messages_panel.message_blocks.children[0])
 
         if self.text_input.text != '':
-            # Message().handle_message('user', 'text', self.text_input.text)
-            # Message().get_message(self.messages_panel)  # show last message
-
-            Message().handle_message('bobby', 'text', self.text_input.text)
+            Message().handle_message('user', 'text', self.text_input.text)
             Message().get_message(self.messages_panel)  # show last message
+
+            # Message().handle_message('bobby', 'text', self.text_input.text)
+            # Message().get_message(self.messages_panel)  # show last message
 
             self.text_input.text = ''
 
-    def refresh_chat(self):
+    def load_chat(self):
         self.messages_panel.message_blocks.clear_widgets()
         self.messages_panel.message_blocks.size[1] = self.messages_panel.message_blocks.spacing
         Message().get_message(self.messages_panel, message_id=True)  # show all messages
