@@ -1,31 +1,30 @@
 
-<Message>:
+<TextMessage>:
     background_color: 0,0,0,0
     canvas.before:
         Color:
-            rgba: (189/255,194/255,199/255,1)
+            rgba: 189/255, 194/255, 199/255, 1
         RoundedRectangle:
-            pos: self.pos
+            pos: self.pos[0], self.pos[1]-2
             size: self.size
-            radius: [20,]
+            radius: [14,]
         Rectangle:
-            pos: self.pos if self.message_from=='bobby' else (self.pos[0]+self.width/2,self.pos[1])
+            pos: (self.pos[0], self.pos[1]-2) if self.message_from=='bobby' else (self.pos[0]+self.width/2,self.pos[1]-2)
             size: self.size[0]/2, self.size[1]/2
 
         Color:
-            rgba: (1,1,1,1) if self.message_from=='bobby' else (239/255,254/255,221/255,1)
+            rgba: (1,1,1,1) if self.message_from=='bobby' else (239/255, 254/255, 221/255, 1)
         RoundedRectangle:
-            pos: (self.pos[0], self.pos[1]+2) if self.message_from=='bobby' else (self.pos[0], self.pos[1]+2)
-            size: self.size[0], self.size[1]-2
-            radius: [18,]
+            pos: self.pos
+            size: self.size
+            radius: [14,]
         Rectangle:
-            pos: (self.pos[0], self.pos[1]+2) if self.message_from=='bobby' else (self.pos[0]+self.width/2,self.pos[1]+2)
-            size: self.size[0]/2, self.size[1]/2-2
-    padding: (12, 10)
+            pos: self.pos if self.message_from=='bobby' else (self.pos[0]+self.width/2,self.pos[1])
+            size: self.size[0]/2, self.size[1]/2
+    padding: (10, 6, 10, 5)
     size_hint_y: None
-
-<TextMessage>:
     orientation: 'horizontal'
+
     content_label: content_label
     time_label: time_label
 
@@ -55,10 +54,31 @@
         color: 180/255, 180/255, 180/255, 1
 
 <ImageMessage>:
-    orientation: 'vertical'
+    background_color: 0,0,0,0
+    canvas.before:
+        Color:
+            rgba: (189/255,194/255,199/255,1)
+        RoundedRectangle:
+            pos: self.pos[0], self.pos[1]-2
+            size: self.size[0], self.size[1]+2
+            radius: [5,]
+
+        Color:
+            rgba: (1,1,1,1) if self.message_from=='bobby' else (239/255,254/255,221/255,1)
+        RoundedRectangle:
+            pos: self.pos[0], self.pos[1]
+            size: self.size
+            radius: [5,]
+    padding: (5, 5)
+    size_hint_y: None
+    size_hint_x: None
+
+    image: image
 
     Image:
+        id: image
         source: 'logo.jpg'
+        size_hint: None, None
         size: self.texture_size
 
 <MessageBlock>:

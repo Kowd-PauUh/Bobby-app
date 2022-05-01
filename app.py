@@ -79,8 +79,11 @@ class Message(BoxLayout):
             message = TextMessage(message_from=message_from, messages_panel=messages_panel, content_type=content_type)
             message.content_label.text = text
             message.time_label.text = time[:5]
-            message.block = messages_panel.message_blocks.children[0]
+        elif content_type == 'image':
+            message = ImageMessage(message_from=message_from, messages_panel=messages_panel, content_type=content_type)
+            message.image.source = image_path
 
+        message.block = messages_panel.message_blocks.children[0]
         Clock.schedule_once(message._rescale, 0)
         messages_panel.message_blocks.children[0].add_widget(message)
         messages_panel.scroll_to(message)
@@ -92,6 +95,19 @@ class Message(BoxLayout):
             self.messages_panel.message_blocks.size[1] += \
                 size + self.messages_panel.message_blocks.spacing
             self.block.size[1] += size + self.block.spacing
+        elif self.content_type == 'image':
+            if self.block.size[0] - 2 * self.padding[0] - 2 * self.block.padding[1] < self.image.texture_size[0]:
+                scale = \
+                    (self.block.size[0] - 2 * self.padding[0] - 2 * self.block.padding[0]) / self.image.texture_size[0]
+                self.image.size[0], self.image.size[1] = self.image.size[0] * scale, self.image.size[1] * scale
+
+            self.size[0] = self.image.size[0] + 2 * self.padding[0]
+            self.size[1] = self.image.size[1] + 2 * self.padding[1]
+            self.messages_panel.message_blocks.size[1] += \
+                self.image.size[1] + self.messages_panel.message_blocks.spacing
+            self.block.size[1] += self.size[1] + self.block.spacing
+            if self.message_from == 'user':
+                self.pos_hint = {'right': 1}
 
 
 class TextMessage(Message):
