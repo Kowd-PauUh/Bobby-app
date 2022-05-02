@@ -81,6 +81,32 @@
         size_hint: None, None
         size: self.texture_size
 
+<InteractiveMessage>:
+    background_color: 0,0,0,0
+    padding: 0
+    size_hint_y: None
+    buttons_panel: buttons_panel
+
+    StackLayout:
+        id: buttons_panel
+        orientation: 'lr-tb'
+        spacing: 0, 3
+
+<CallbackButton>:
+    canvas.before:
+        Color:
+            rgba: 0,0,0,0.18
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size[0]-3, self.size[1]
+            radius: [6,]
+    background_color: 0,0,0,0
+    size_hint: None, None
+    padding: 12, 6
+
+    on_press:
+        root.reply()
+
 <MessageBlock>:
 
     # для отладки

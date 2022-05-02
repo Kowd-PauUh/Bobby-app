@@ -1,4 +1,6 @@
 from imports import *
+from bobby import Bobby
+bobby = Bobby()
 
 Config.set('kivy', 'keyboard_mode', 'systemanddock')
 if exists('AppData/chat-history.db'):
@@ -60,13 +62,12 @@ class Message(BoxLayout):
             sql = 'SELECT * FROM HISTORY'
         else:  # the last message
             sql = 'SELECT * FROM HISTORY WHERE message_id = (SELECT MAX(message_id) FROM HISTORY)'
-
+        kwargs_names = ['message_id', 'message_from', 'content_type', 'text', 'image_path',
+                        'audio_path', 'video_path', 'date', 'time', 'reply_to']
         with con:
             messages_info = con.execute(sql)
         for message_info in messages_info:
             # создаю словарь параметров сообщения который потом распакую
-            kwargs_names = ['message_id', 'message_from', 'content_type', 'text', 'image_path',
-                            'audio_path', 'video_path', 'date', 'time', 'reply_to']
             kwargs = dict(zip(kwargs_names, message_info))
 
             date = message_info[-3]
@@ -75,6 +76,8 @@ class Message(BoxLayout):
             elif messages_panel.message_blocks.children[0].date != date:  # если блок есть, просто добавляю сообщение
                 Message().add_block(messages_panel, date)
             Message().show_message(messages_panel, **kwargs)
+
+        return Message(**kwargs)
 
     @staticmethod
     def add_block(messages_panel: ScrollView, date):
@@ -95,6 +98,13 @@ class Message(BoxLayout):
         elif content_type == 'image':
             message = ImageMessage(messages_panel=messages_panel, **kwargs)
             message.image.source = message.image_path
+        elif content_type == 'interactive':
+            message = InteractiveMessage(messages_panel=messages_panel, **kwargs)
+            buttons = literal_eval(message.text)
+            for button_name in buttons:
+                callback_data = buttons.get(button_name)
+                button = CallbackButton(callback_data=callback_data, text=button_name)
+                message.buttons_panel.add_widget(button)
 
         message.block = messages_panel.message_blocks.children[0]
         Clock.schedule_once(message._rescale, 0)
@@ -109,7 +119,7 @@ class Message(BoxLayout):
                 size + self.messages_panel.message_blocks.spacing
             self.block.size[1] += size + self.block.spacing
         elif self.content_type == 'image':
-            if self.block.size[0] - 2 * self.padding[0] - 2 * self.block.padding[1] < self.image.texture_size[0]:
+            if self.block.size[0] - 2 * self.padding[0] - 2 * self.block.padding[0] < self.image.texture_size[0]:
                 scale = \
                     (self.block.size[0] - 2 * self.padding[0] - 2 * self.block.padding[0]) / self.image.texture_size[0]
                 self.image.size[0], self.image.size[1] = self.image.size[0] * scale, self.image.size[1] * scale
@@ -121,6 +131,58 @@ class Message(BoxLayout):
             self.block.size[1] += self.size[1] + self.block.spacing
             if self.message_from == 'user':
                 self.pos_hint = {'right': 1}
+        elif self.content_type == 'interactive':
+            rows = [[]]
+            max_row_len = 0
+            width = 0
+            counter = 0
+            max_width = self.block.size[0] - 2 * self.padding[0] - 2 * self.block.padding[0]
+
+            reversed_panel = []
+            for button in self.buttons_panel.children:
+                reversed_panel.insert(0, button)
+
+            for button in reversed_panel:
+                button.size = button.texture_size
+                if width + button.size[0] <= max_width:
+                    width += button.size[0]
+                    rows[-1].append((counter, button.size[0]))
+                    if width > max_row_len:
+                        max_row_len = width
+                else:
+                    if width > max_row_len:
+                        max_row_len = width
+                    rows.append([])
+                    rows[-1].append((counter, button.size[0]))
+                    width = button.size[0]
+                counter += 1
+
+            for row in rows:
+                sum_width = sum([w for i, w in row])
+                if max_row_len / max_width >= 0.75:
+                    scale = max_width / sum_width
+                else:
+                    scale = max_row_len / sum_width
+
+                for i, w in row:
+                    reversed_panel[i].size[0] *= scale
+
+            size = len(rows) * button.size[1] + (len(rows) - 1) * self.buttons_panel.spacing[1]
+            self.size[1] = size
+            self.messages_panel.message_blocks.size[1] += \
+                size + self.messages_panel.message_blocks.spacing
+            self.block.size[1] += size + self.block.spacing
+
+
+class CallbackButton(Button):
+    callback_data = Property(None)
+
+    def reply(self):
+        bobby.handle_reply(self.callback_data)
+
+
+class InteractiveMessage(Message):
+    pass
 
 
 class TextMessage(Message):
@@ -152,8 +214,9 @@ class Container(BoxLayout):
 
         if self.text_input.text != '':
             Message().handle_message('user', 'text', self.text_input.text)
-            Message().get_message(self.messages_panel)  # show last message
             self.text_input.text = ''
+            message = Message().get_message(self.messages_panel)  # show last message
+            bobby.handle_message(message)
 
     def load_chat(self):
         self.messages_panel.message_blocks.clear_widgets()
@@ -186,6 +249,7 @@ class BobbyApp(App):
 
     def build(self):
         container = Container()
+        bobby.add_message_panel(container.messages_panel)
         Clock.schedule_interval(container.loop, .1)
         return container
 
