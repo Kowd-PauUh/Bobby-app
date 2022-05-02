@@ -117,7 +117,7 @@ class Message(BoxLayout):
             self.size[0] = self.image.size[0] + 2 * self.padding[0]
             self.size[1] = self.image.size[1] + 2 * self.padding[1]
             self.messages_panel.message_blocks.size[1] += \
-                self.image.size[1] + self.messages_panel.message_blocks.spacing
+                self.image.size[1] + self.messages_panel.message_blocks.spacing + 2 * self.block.spacing
             self.block.size[1] += self.size[1] + self.block.spacing
             if self.message_from == 'user':
                 self.pos_hint = {'right': 1}
