@@ -29,8 +29,18 @@ class MessageBlock(BoxLayout):
 class Message(BoxLayout):
     messages_panel = ObjectProperty()  # панель в которой находятся блоки с сообщениями
     block = ObjectProperty()  # блок в котором находятся сообщения (в каждом блоке сообщения определенной даты отправки)
-    message_from = StringProperty()
-    content_type = StringProperty()
+
+    # параметры сообщения
+    message_id = Property(None)
+    message_from = Property(None)
+    content_type = Property(None)
+    text = Property(None)
+    image_path = Property(None)
+    audio_path = Property(None)
+    video_path = Property(None)
+    date = Property(None)
+    time = Property(None)
+    reply_to = Property(None)
 
     @staticmethod
     def handle_message(message_from: str, content_type: str, text: str = None, reply_to: int = None,
@@ -54,15 +64,17 @@ class Message(BoxLayout):
         with con:
             messages_info = con.execute(sql)
         for message_info in messages_info:
-            message_id, message_from, content_type, text, image_path, audio_path, video_path, date, time, reply_to \
-                = message_info
+            # создаю словарь параметров сообщения который потом распакую
+            kwargs_names = ['message_id', 'message_from', 'content_type', 'text', 'image_path',
+                            'audio_path', 'video_path', 'date', 'time', 'reply_to']
+            kwargs = dict(zip(kwargs_names, message_info))
 
+            date = message_info[-3]
             if not messages_panel.message_blocks.children:  # создание блока сообщения
                 Message().add_block(messages_panel, date)
-            elif messages_panel.message_blocks.children[0].date != date:
+            elif messages_panel.message_blocks.children[0].date != date:  # если блок есть, просто добавляю сообщение
                 Message().add_block(messages_panel, date)
-            Message().show_message(messages_panel, message_id, message_from, content_type, text,
-                                   image_path, audio_path, video_path, date, time, reply_to)
+            Message().show_message(messages_panel, **kwargs)
 
     @staticmethod
     def add_block(messages_panel: ScrollView, date):
@@ -73,15 +85,16 @@ class Message(BoxLayout):
         messages_panel.message_blocks.size[1] += new_block.size[1] + messages_panel.message_blocks.spacing
 
     @staticmethod
-    def show_message(messages_panel: ScrollView, message_id: int, message_from: str, content_type: str, text: str,
-                     image_path, audio_path, video_path, date, time, reply_to: int):
+    def show_message(messages_panel: ScrollView, **kwargs):
+        """ В kwargs должны быть определены все параметры сообщения. """
+        content_type = kwargs.get('content_type')
         if content_type == 'text':
-            message = TextMessage(message_from=message_from, messages_panel=messages_panel, content_type=content_type)
-            message.content_label.text = text
-            message.time_label.text = time[:5]
+            message = TextMessage(messages_panel=messages_panel, **kwargs)
+            message.content_label.text = message.text
+            message.time_label.text = message.time[:5]
         elif content_type == 'image':
-            message = ImageMessage(message_from=message_from, messages_panel=messages_panel, content_type=content_type)
-            message.image.source = image_path
+            message = ImageMessage(messages_panel=messages_panel, **kwargs)
+            message.image.source = message.image_path
 
         message.block = messages_panel.message_blocks.children[0]
         Clock.schedule_once(message._rescale, 0)
