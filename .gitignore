@@ -3,3 +3,13 @@ app/
 .idea/
 __pycache__/
 testing.py
+
+AppData/chat-history.db
+AppData/defaults/
+AppData/guides/
+AppData/images/
+AppData/cpfc.csv
+AppData/messages.py
+
+src/
+config.py
