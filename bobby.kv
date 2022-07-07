@@ -148,6 +148,28 @@
         size: 0, self.spacing
         spacing: 5
 
+<MessagesPanel>:
+    canvas.before:
+        Color:
+            rgba: (211/255, 233/255, 235/255, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    size_hint: (1, 0.84)
+    bar_color: 81/255, 125/255, 162/255, 1
+    viewclass: 'BoxLayout'
+
+    message_blocks: message_blocks
+
+    BoxLayout:
+        id: message_blocks
+        orientation: 'vertical'
+        size_hint_y: None
+        size_hint_x: 1
+#        size: 1, self.spacing
+        padding: 5
+        spacing: 5
+
 <Container>:
     orientation: 'vertical'
 
@@ -173,28 +195,8 @@
             text: 'Bobby'
             font_size: 16
 
-    RecycleView:  # панель сообщений
+    MessagesPanel:  # панель сообщений
         id: messages_panel
-        canvas.before:
-            Color:
-                rgba: (211/255, 233/255, 235/255, 1)
-            Rectangle:
-                pos: self.pos
-                size: self.size
-        size_hint: (1, 0.84)
-        bar_color: 81/255, 125/255, 162/255, 1
-        viewclass: 'BoxLayout'
-
-        message_blocks: message_blocks
-
-        BoxLayout:
-            id: message_blocks
-            orientation: 'vertical'
-            size_hint_y: None
-            size_hint_x: 1
-#            size: 1, self.spacing
-            padding: 5
-            spacing: 5
 
     BoxLayout:  # панель ввода
         id: input_panel

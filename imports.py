@@ -8,6 +8,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.scrollview import ScrollView
+from kivy.uix.recycleview import RecycleView
 from kivy.graphics import Color, RoundedRectangle
 
 import sqlite3 as sl
