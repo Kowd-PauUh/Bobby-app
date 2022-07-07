@@ -5,9 +5,5 @@ __pycache__/
 testing.py
 
 AppData/defaults/
-AppData/guides/
 AppData/images/
-AppData/cpfc.csv
 AppData/messages.py
-
-config.py
