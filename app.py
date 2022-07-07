@@ -12,8 +12,8 @@ if not exists('AppData/chat-history.db'):
             CREATE TABLE HISTORY (
                 message_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                 message_from TEXT, -- bobby / user
-                content_type TEXT, -- text / image / audio / video
-                text TEXT, -- if type is text
+                content_type TEXT, -- text / image / audio / video / interactive
+                text TEXT, -- if type is text / interactive
                 image_path TEXT, -- if type is image
                 audio_path TEXT, -- if type is audio
                 video_path TEXT, -- if type is video
@@ -179,6 +179,20 @@ class CallbackButton(Button):
 
     def reply(self):
         bobby.handle_reply(self.callback_data)
+
+    def on_press(self):
+        # срабатывает с задержкой в долю секунды из-за проверок на нажатие вышестоящих в иерархии виджетов
+        self._color_change(0, 0, 0, 0.3)
+        self.reply()
+
+    def on_release(self):
+        self._color_change(0, 0, 0, 0.18)
+
+    def _color_change(self, r, g, b, a):
+        self.canvas.before.clear()
+        with self.canvas.before:
+            Color(r, g, b, a, mode='rgba')
+            RoundedRectangle(pos=self.pos, size=(self.size[0] - 3, self.size[1]), radius=[6, ])
 
 
 class InteractiveMessage(Message):
